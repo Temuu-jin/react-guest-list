@@ -76,3 +76,8 @@ Object Array guestList = [Guest{}, Guest{}, ...]
 
 Main Screen: Getting all guests
 Functional Screen: Add new Guest, Delete Guest, Tick Attending/Not Attending
+<GuestList>
+<Guest1> <Attending> <Delete>
+<Guest2> <Attending> <Delete>
+</GuestList>
+<AddGuest firstName lastName attending/>
