@@ -25,55 +25,80 @@ export default function GuestList() {
     setGuests(updatedGuests);
   };
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    addGuest();
+  };
+
+  const toggleAttendingStatus = (index) => {
+    const updatedGuests = [...guests]; // copy guestsArray
+    updatedGuests[index].attending = !updatedGuests[index].attending; // toggle guests[index]
+    setGuests(updatedGuests); // save the updated guestsArray to state
+  };
+
   return (
-    <div>
+    <>
+      {' '}
       <header>
         <h1 className={styles.title}>Welcome to GuestList!</h1>
       </header>
       <body>
-        <div>
-          <p>List of guests</p>
-          <ul>
-            {guests.map((guest, index) => (
-              <li key={index}>
-                {guest.firstName} {guest.lastName}
-                <label>
-                  Attending:
-                  <input
-                    type="radio"
-                    checked={guest.attending}
-                    onChange={handleInputChange}
-                  />
-                </label>
-                <button onClick={() => deleteGuest(index)}>Delete</button>
-              </li>
-            ))}
-          </ul>
+        <div className={styles.listContainer}>
+          <h2>List of guests</h2>
+          <br />
+          <br />
 
-          <p>
-            Interface includes: Delete Guest from List, Radio Button
-            Attending/Not Attending
-          </p>
+          {guests.length > 0 ? (
+            <ul style={{ listStyle: 'none' }}>
+              {guests.map((guest, index) => (
+                <li key={index} style={{ textTransform: 'capitalize' }}>
+                  {guest.firstName} {guest.lastName} Attending:{' '}
+                  {guest.attending ? 'Yes' : 'No'}{' '}
+                  <button onClick={() => toggleAttendingStatus(index)}>
+                    Attending/Not Attending
+                  </button>{' '}
+                  <button onClick={() => deleteGuest(index)}>Delete</button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No guests</p>
+          )}
         </div>
+        <br />
+        <br />
+
         <div>
-          <p>Interface to Add Guest</p>
-          <div>
-            <input
-              type="text"
-              name="firstName"
-              placeholder="First Name"
-              value={newGuest.firstName}
-              onChange={handleInputChange}
-            />
-            <input
-              type="text"
-              name="lastName"
-              placeholder="Last Name"
-              value={newGuest.lastName}
-              onChange={handleInputChange}
-            />
+          <p>Add Guest</p>
+          <form onSubmit={handleSubmit}>
             <label>
-              Attending:
+              First Name:{' '}
+              <input
+                type="text"
+                name="firstName"
+                placeholder="First Name"
+                value={newGuest.firstName}
+                onChange={handleInputChange}
+              />
+            </label>
+            <br />
+            <br />
+
+            <label>
+              Last Name:{' '}
+              <input
+                type="text"
+                name="lastName"
+                placeholder="Last Name"
+                value={newGuest.lastName}
+                onChange={handleInputChange}
+              />
+            </label>
+            <br />
+            <br />
+
+            <label>
+              Attending:{' '}
               <select
                 name="attending"
                 value={newGuest.attending}
@@ -82,12 +107,14 @@ export default function GuestList() {
                 <option value={true}>Yes</option>
                 <option value={false}>No</option>
               </select>
-              No
             </label>
-            <button onClick={addGuest}>Add Guest</button>
-          </div>
+            <br />
+            <br />
+
+            <button type="submit">Add Guest</button>
+          </form>
         </div>
       </body>
-    </div>
+    </>
   );
 }
