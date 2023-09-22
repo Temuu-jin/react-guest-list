@@ -1,7 +1,128 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './App.module.scss';
 
+const baseUrl = 'http://localhost:4000';
+
 export default function GuestList() {
+  const [guests, setGuests] = useState([]);
+  const [newGuest, setNewGuest] = useState({
+    firstName: '',
+    lastName: '',
+    attending: false,
+  });
+
+  useEffect(() => {
+    // fetch all guests
+    async function fetchGuests() {
+      try {
+        const response = await fetch(`${baseUrl}/guests`);
+        const fetchData = await response.json();
+        setGuests(fetchData);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchGuests();
+  }, []);
+
+  // add a guest
+  // add newGuest to ...guests and POST to API
+  const addGuest = async () => {
+    try {
+      const response = await fetch(`${baseUrl}/guests`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: newGuest.firstName,
+          lastName: newGuest.lastName,
+          attending: newGuest.attending ? 'true' : 'false',
+        }),
+      });
+      if (!response.ok) {
+        console.error('Request failed with status:', response.status);
+        // Handle the error condition here if needed
+        return;
+      }
+      const data = await response.json();
+      setGuests([...guests, data]);
+      setNewGuest({ firstName: '', lastName: '', attending: false }); // Reset to false for the next guest
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // delete a guest
+  const deleteGuest = async (id) => {
+    try {
+      const response = await fetch(`${baseUrl}/guests/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // Filter out the deleted guest from the state
+        const updatedGuests = guests.filter((guest) => guest.id !== id);
+        setGuests(updatedGuests);
+      } else {
+        console.error('Failed to delete guest:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error deleting guest:', error);
+    }
+  };
+
+  // toggle attending status
+  const handleCheckboxChange = (guest) => async (event) => {
+    const isChecked = event.target.checked;
+    setGuests((prevGuests) =>
+      prevGuests.map((prevGuest) =>
+        prevGuest.id === guest.id
+          ? { ...prevGuest, attending: isChecked }
+          : prevGuest,
+      ),
+    );
+
+    try {
+      const response = await fetch(`${baseUrl}/guests/${guest.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ attending: isChecked }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to update guest:', response.statusText);
+
+        // If the request failed, revert change in UI by flipping isChecked
+        setGuests((prevGuests) =>
+          prevGuests.map((prevGuest) =>
+            prevGuest.id === guest.id
+              ? { ...prevGuest, attending: !isChecked }
+              : prevGuest,
+          ),
+        );
+      }
+    } catch (error) {
+      console.error('Error on checkbox change:', error);
+    }
+  };
+
+  // handle submit
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    addGuest();
+  };
+
+  // handle input change
+  const handleInputChange = (event) => {
+    const { name } = event.target;
+    const value = event.target.value;
+
+    setNewGuest({ ...newGuest, [name]: value });
+  };
+  /* export default function GuestList() {
   const [guests, setGuests] = useState([]);
   const [newGuest, setNewGuest] = useState({
     firstName: '',
@@ -16,7 +137,7 @@ export default function GuestList() {
 
   const addGuest = () => {
     setGuests([...guests, newGuest]);
-    setNewGuest({ firstName: '', lastName: '', attending: false });
+    setNewGuest({ firstName: '', lastName: '', attending: null });
   };
 
   const deleteGuest = (index) => {
@@ -35,7 +156,7 @@ export default function GuestList() {
     updatedGuests[index].attending = !updatedGuests[index].attending; // toggle guests[index]
     setGuests(updatedGuests); // save the updated guestsArray to state
   };
-
+ */
   return (
     <>
       {' '}
@@ -47,17 +168,18 @@ export default function GuestList() {
           <h2>List of guests</h2>
           <br />
           <br />
-
           {guests.length > 0 ? (
             <ul style={{ listStyle: 'none' }}>
-              {guests.map((guest, index) => (
-                <li key={index} style={{ textTransform: 'capitalize' }}>
-                  {guest.firstName} {guest.lastName} Attending:{' '}
-                  {guest.attending ? 'Yes' : 'No'}{' '}
-                  <button onClick={() => toggleAttendingStatus(index)}>
-                    Attending/Not Attending
-                  </button>{' '}
-                  <button onClick={() => deleteGuest(index)}>Delete</button>
+              {guests.map((guest) => (
+                <li key={guest.id} className={styles.listItem}>
+                  {guest.firstName} {guest.lastName} Attending Status:{' '}
+                  <input
+                    type="checkbox"
+                    name="attending"
+                    checked={guest.attending}
+                    onChange={handleCheckboxChange(guest)}
+                  />{' '}
+                  <button onClick={() => deleteGuest(guest.id)}>Remove</button>
                 </li>
               ))}
             </ul>
@@ -68,7 +190,7 @@ export default function GuestList() {
         <br />
         <br />
 
-        <div>
+        <div className={styles.addGuestContainer} data-test-id="guest">
           <p>Add Guest</p>
           <form onSubmit={handleSubmit}>
             <label>
@@ -76,7 +198,7 @@ export default function GuestList() {
               <input
                 type="text"
                 name="firstName"
-                placeholder="First Name"
+                required={true}
                 value={newGuest.firstName}
                 onChange={handleInputChange}
               />
@@ -89,25 +211,12 @@ export default function GuestList() {
               <input
                 type="text"
                 name="lastName"
-                placeholder="Last Name"
+                required={true}
                 value={newGuest.lastName}
                 onChange={handleInputChange}
               />
             </label>
-            <br />
-            <br />
 
-            <label>
-              Attending:{' '}
-              <select
-                name="attending"
-                value={newGuest.attending}
-                onChange={handleInputChange}
-              >
-                <option value={true}>Yes</option>
-                <option value={false}>No</option>
-              </select>
-            </label>
             <br />
             <br />
 
