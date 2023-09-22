@@ -174,12 +174,18 @@ export default function GuestList() {
                 <li key={guest.id} className={styles.listItem}>
                   {guest.firstName} {guest.lastName} Attending Status:{' '}
                   <input
+                    aria-label="attending"
                     type="checkbox"
                     name="attending"
                     checked={guest.attending}
                     onChange={handleCheckboxChange(guest)}
                   />{' '}
-                  <button onClick={() => deleteGuest(guest.id)}>Remove</button>
+                  <button
+                    onClick={() => deleteGuest(guest.id)}
+                    aria-label="Remove"
+                  >
+                    Remove
+                  </button>
                 </li>
               ))}
             </ul>
