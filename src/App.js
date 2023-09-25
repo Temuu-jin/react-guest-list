@@ -202,7 +202,7 @@ export default function GuestList() {
           <p>Add Guest</p>
           <form onSubmit={handleSubmit}>
             <label>
-              First name:
+              First name
               <input
                 name="firstName"
                 required={true}
@@ -214,7 +214,7 @@ export default function GuestList() {
             <br />
 
             <label>
-              Last name:
+              Last name
               <input
                 name="lastName"
                 required={true}
