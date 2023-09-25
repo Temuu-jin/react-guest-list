@@ -4,6 +4,7 @@ import styles from './App.module.scss';
 const baseUrl = 'http://localhost:4000';
 
 export default function GuestList() {
+  const [isLoaded, setIsLoaded] = useState(false);
   const [guests, setGuests] = useState([]);
   const [newGuest, setNewGuest] = useState({
     firstName: '',
@@ -18,11 +19,12 @@ export default function GuestList() {
         const response = await fetch(`${baseUrl}/guests`);
         const fetchData = await response.json();
         setGuests(fetchData);
+        setIsLoaded(true);
       } catch (error) {
         console.error(error);
       }
     }
-    fetchGuests();
+    fetchGuests().catch(console.error);
   }, []);
 
   // add a guest
@@ -112,7 +114,7 @@ export default function GuestList() {
   // handle submit
   const handleSubmit = (event) => {
     event.preventDefault();
-    addGuest();
+    addGuest().catch(console.error);
   };
 
   // handle input change
@@ -157,7 +159,7 @@ export default function GuestList() {
     setGuests(updatedGuests); // save the updated guestsArray to state
   };
  */
-  return (
+  return isLoaded ? (
     <>
       {' '}
       <header>
@@ -171,7 +173,7 @@ export default function GuestList() {
           {guests.length > 0 ? (
             <ul style={{ listStyle: 'none' }}>
               {guests.map((guest) => (
-                <li key={guest.id} className={styles.listItem}>
+                <li key={`guest-${guest.id}`} className={styles.listItem}>
                   {guest.firstName} {guest.lastName} Attending Status:{' '}
                   <input
                     aria-label="attending"
@@ -202,7 +204,6 @@ export default function GuestList() {
             <label>
               First Name:{' '}
               <input
-                type="text"
                 name="firstName"
                 required={true}
                 value={newGuest.firstName}
@@ -215,7 +216,6 @@ export default function GuestList() {
             <label>
               Last Name:{' '}
               <input
-                type="text"
                 name="lastName"
                 required={true}
                 value={newGuest.lastName}
@@ -226,10 +226,12 @@ export default function GuestList() {
             <br />
             <br />
 
-            <button type="submit">Add Guest</button>
+            <button>Add Guest</button>
           </form>
         </div>
       </body>
     </>
+  ) : (
+    <p>Loading...</p>
   );
 }
