@@ -19,10 +19,10 @@ export default function GuestList() {
         const response = await fetch(`${baseUrl}/guests`);
         const fetchData = await response.json();
         setGuests(fetchData);
-        setIsLoaded(true);
       } catch (error) {
         console.error(error);
       }
+      setIsLoaded(true);
     }
     fetchGuests().catch(console.error);
   }, []);
@@ -200,7 +200,7 @@ export default function GuestList() {
 
         <div className={styles.addGuestContainer} data-test-id="guest">
           <p>Add Guest</p>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} disabled={!isLoaded}>
             <label>
               First name
               <input
