@@ -159,83 +159,79 @@ export default function GuestList() {
     setGuests(updatedGuests); // save the updated guestsArray to state
   };
  */
-  return (
+  return isLoaded ? (
     <>
       {' '}
       <header>
         <h1 className={styles.title}>Welcome to GuestList!</h1>
       </header>
       <body>
-        {isLoaded ? (
-          <>
-            <div className={styles.listContainer}>
-              <h2>List of guests</h2>
-              <br />
-              <br />
-              {guests.length > 0 ? (
-                <ul style={{ listStyle: 'none' }}>
-                  {guests.map((guest) => (
-                    <li key={`guest-${guest.id}`} className={styles.listItem}>
-                      {guest.firstName} {guest.lastName} Attending Status:{' '}
-                      <input
-                        aria-label="attending"
-                        type="checkbox"
-                        name="attending"
-                        checked={guest.attending}
-                        onChange={handleCheckboxChange(guest)}
-                      />{' '}
-                      <button
-                        onClick={() => deleteGuest(guest.id)}
-                        aria-label="Remove"
-                      >
-                        Remove
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No guests</p>
-              )}
-            </div>
+        <div className={styles.listContainer}>
+          <h2>List of guests</h2>
+          <br />
+          <br />
+          {guests.length > 0 ? (
+            <ul style={{ listStyle: 'none' }}>
+              {guests.map((guest) => (
+                <li key={`guest-${guest.id}`} className={styles.listItem}>
+                  {guest.firstName} {guest.lastName} Attending Status:{' '}
+                  <input
+                    aria-label="attending"
+                    type="checkbox"
+                    name="attending"
+                    checked={guest.attending}
+                    onChange={handleCheckboxChange(guest)}
+                  />{' '}
+                  <button
+                    onClick={() => deleteGuest(guest.id)}
+                    aria-label="Remove"
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No guests</p>
+          )}
+        </div>
+        <br />
+        <br />
+
+        <div className={styles.addGuestContainer} data-test-id="guest">
+          <p>Add Guest</p>
+          <form onSubmit={handleSubmit}>
+            <label>
+              First name
+              <input
+                name="firstName"
+                required={true}
+                value={newGuest.firstName}
+                onChange={handleInputChange}
+              />
+            </label>
+            <br />
+            <br />
+
+            <label>
+              Last name
+              <input
+                name="lastName"
+                required={true}
+                value={newGuest.lastName}
+                onChange={handleInputChange}
+              />
+            </label>
 
             <br />
             <br />
-            <div className={styles.addGuestContainer} data-test-id="guest">
-              <p>Add Guest</p>
-              <form onSubmit={handleSubmit} disabled={!isLoaded}>
-                <label>
-                  First name
-                  <input
-                    name="firstName"
-                    required={true}
-                    value={newGuest.firstName}
-                    onChange={handleInputChange}
-                  />
-                </label>
-                <br />
-                <br />
 
-                <label>
-                  Last name
-                  <input
-                    name="lastName"
-                    required={true}
-                    value={newGuest.lastName}
-                    onChange={handleInputChange}
-                  />
-                </label>
-
-                <br />
-                <br />
-
-                <button>Add Guest</button>
-              </form>
-            </div>
-          </>
-        ) : (
-          <p>Loading...</p>
-        )}
+            <button>Add Guest</button>
+          </form>
+        </div>
       </body>
     </>
+  ) : (
+    <p>Loading...</p>
   );
 }
