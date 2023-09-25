@@ -159,7 +159,9 @@ export default function GuestList() {
     setGuests(updatedGuests); // save the updated guestsArray to state
   };
  */
-  return isLoaded ? (
+  return !isLoaded ? (
+    <p>Loading...</p>
+  ) : (
     <>
       {' '}
       <header>
@@ -233,7 +235,5 @@ export default function GuestList() {
         </div>
       </body>
     </>
-  ) : (
-    <p>Loading...</p>
   );
 }
