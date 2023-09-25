@@ -22,9 +22,9 @@ export default function GuestList() {
       } catch (error) {
         console.error(error);
       }
-      setIsLoaded(true);
     }
     fetchGuests().catch(console.error);
+    setIsLoaded(true);
   }, []);
 
   // add a guest
@@ -208,6 +208,7 @@ export default function GuestList() {
                 required={true}
                 value={newGuest.firstName}
                 onChange={handleInputChange}
+                disabled={!isLoaded}
               />
             </label>
             <br />
@@ -220,6 +221,7 @@ export default function GuestList() {
                 required={true}
                 value={newGuest.lastName}
                 onChange={handleInputChange}
+                disabled={!isLoaded}
               />
             </label>
 
